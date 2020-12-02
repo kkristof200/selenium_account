@@ -1,0 +1,1 @@
+TIME_OUT_ERROR = TimeoutError('Operation has timed out.')
