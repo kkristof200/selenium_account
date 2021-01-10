@@ -153,7 +153,7 @@ class SeleniumAccount:
 
             return False
 
-        self.print('Successfully logged in. Saving cookies.'.)
+        self.print('Successfully logged in. Saving cookies.')
         time.sleep(0.5)
         self.browser.get(self.home_url)
         time.sleep(0.5)
@@ -161,8 +161,8 @@ class SeleniumAccount:
 
         return True
     
-    def print(self, *args) -> None:
-        print('{} - {} -'.format(self.page_name, self.__internal_id), *args)
+    def print(self, *args, **kwargs) -> None:
+        print('{} - {} -'.format(self.page_name, self.__internal_id), *args **kwargs)
 
     def save_cookies(self) -> None:
         self.browser.save_cookies()
