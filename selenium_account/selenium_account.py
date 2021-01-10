@@ -10,6 +10,9 @@ from selenium_firefox import Firefox
 import tldextract
 import stopit
 
+# Local
+from .time_out_error import time_out_error
+
 # ---------------------------------------------------------------------------------------------------------------------------------------- #
 
 
@@ -115,14 +118,6 @@ class SeleniumAccount:
         self.__page_name = self.domain.lower().title()
 
         return self.__page_name
-    
-    def time_out_error(self, custom_message: Optional[str] = None) -> TimeoutError:
-        message = 'TimeoutError - {} - {} - Operation did time out.'.format(self.page_name, self.__internal_id)
-
-        if custom_message:
-            message += ' - {}'.format(custom_message)
-
-        return TimeoutError(message)
 
 
     # -------------------------------------------------------- Public methods -------------------------------------------------------- #
@@ -181,7 +176,7 @@ class SeleniumAccount:
 
     # ------------------------------------------------------- Private methods -------------------------------------------------------- #
 
-    @stopit.signal_timeoutable(default=self.time_out_error('Login'), timeout_param='timeout')
+    @stopit.signal_timeoutable(default=time_out_error('Login'), timeout_param='timeout')
     def __call_login_prompt_callback(
         self,
         login_prompt_callback: Callable[[srt], None],
