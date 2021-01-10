@@ -1,7 +1,7 @@
 # --------------------------------------------------------------- Imports ---------------------------------------------------------------- #
 
 # System
-import time
+import time, os
 from abc import abstractmethod
 from typing import Optional, List, Tuple
 
@@ -56,6 +56,11 @@ class SeleniumAccount:
             disable_images=disable_images,
             default_find_func_timeout=default_find_func_timeout
         )
+
+        try:
+            self.__internal_id = cookies_folder_path.strip(os.path.sep).split(os.path.sep)[-1]
+        except:
+            self.__internal_id = cookies_folder_path or self.browser.cookies_folder_path
 
         self.browser.get(self.home_url)
 
@@ -112,7 +117,7 @@ class SeleniumAccount:
         return self.__page_name
     
     def time_out_error(self, custom_message: Optional[str] = None) -> TimeoutError:
-        message = 'TimeoutError - {} - Operation did time out.'.format(self.page_name)
+        message = 'TimeoutError - {} - {} - Operation did time out.'.format(self.page_name, self.__internal_id)
 
         if custom_message:
             message += ' - {}'.format(custom_message)
@@ -133,14 +138,14 @@ class SeleniumAccount:
         login_actual_result = login_cookies_result and self.is_logged_in
 
         if not login_cookies_result:
-            print('{} - Could not log in via cookies.'.format(page_name))
+            print('{} - {} - Could not log in via cookies.'.format(self.page_name, self.__internal_id))
         elif not login_actual_result:
-            print('{} - Did find cookies, but could not log in with them.'.format(page_name))
+            print('{} - {} - Did find cookies, but could not log in with them.'.format(self.page_name, self.__internal_id))
 
         if not login_actual_result:
             if prompt_user_input_login or login_prompt_callback is not None:
                 def local_login_prompt_callback():
-                    input('{} - Log in and press Enter/Return: '.format(page_name))
+                    input('{} - {} - Log in and press Enter/Return: '.format(self.page_name, self.__internal_id))
 
                 try:
                     self.__call_login_prompt_callback(login_prompt_callback if login_prompt_callback is not None else local_login_prompt_callback, timeout=login_prompt_timeout_seconds)
@@ -149,11 +154,11 @@ class SeleniumAccount:
                 except Exception as e:
                     print(e)
 
-            print('{} - Did not log in.'.format(page_name))
+            print('{} - {} - Did not log in.'.format(self.page_name, self.__internal_id))
 
             return False
 
-        print('{} - Successfully logged in. Saving cookies.'.format(page_name))
+        print('{} - {} - Successfully logged in. Saving cookies.'.format(self.page_name, self.__internal_id))
         time.sleep(0.5)
         self.browser.get(self.home_url)
         time.sleep(0.5)
