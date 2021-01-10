@@ -160,7 +160,7 @@ class SeleniumAccount:
         self.save_cookies()
 
         return True
-    
+
     def print(self, *args, **kwargs) -> None:
         print('{} - {} -'.format(self.page_name, self.__internal_id), *args, **kwargs)
 
@@ -208,11 +208,11 @@ class SeleniumAccount:
         login_prompt_callback(message)
 
     @staticmethod
-    def __time_out_error(page_name: str, internal_id: str, custom_message: Optional[str] = None) -> TimeoutError:
-        message = 'TimeoutError - {} - {} - Operation did time out.'.format(page_name, internal_id)
+    def __time_out_error(custom_message: Optional[str] = None) -> TimeoutError:
+        message = 'TimeoutError - Operation did time out'
 
         if custom_message:
-            message += ' - {}'.format(custom_message)
+            message += ': \'{}\''.format(custom_message)
 
         return TimeoutError(message)
 
