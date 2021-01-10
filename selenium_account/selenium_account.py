@@ -72,7 +72,7 @@ class SeleniumAccount:
                 save_cookies=True
             )
         except Exception as e:
-            print(e)
+            self.print(e)
             self.did_log_in_at_init = False
             # self.quit()
 
@@ -130,9 +130,9 @@ class SeleniumAccount:
         login_actual_result = login_cookies_result and self.is_logged_in
 
         if not login_cookies_result:
-            print('{} - {} - Could not log in via cookies.'.format(self.page_name, self.__internal_id))
+            self.print('Could not log in via cookies.')
         elif not login_actual_result:
-            print('{} - {} - Did find cookies, but could not log in with them.'.format(self.page_name, self.__internal_id))
+            self.print('Did find cookies, but could not log in with them.')
 
         if not login_actual_result:
             if prompt_user_input_login or login_prompt_callback is not None:
@@ -147,19 +147,22 @@ class SeleniumAccount:
 
                     return self.login_via_cookies(promt_user_input_login=False, save_cookies=save_cookies)
                 except Exception as e:
-                    print(e)
+                    self.print(e)
 
-            print('{} - {} - Did not log in.'.format(self.page_name, self.__internal_id))
+            self.print('Did not log in.')
 
             return False
 
-        print('{} - {} - Successfully logged in. Saving cookies.'.format(self.page_name, self.__internal_id))
+        self.print('Successfully logged in. Saving cookies.'.)
         time.sleep(0.5)
         self.browser.get(self.home_url)
         time.sleep(0.5)
         self.save_cookies()
 
         return True
+    
+    def print(self, *args) -> None:
+        print('{} - {} -'.format(self.page_name, self.__internal_id), *args)
 
     def save_cookies(self) -> None:
         self.browser.save_cookies()
