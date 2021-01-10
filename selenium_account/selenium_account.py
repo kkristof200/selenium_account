@@ -8,7 +8,7 @@ from typing import Optional, List, Tuple, Callable
 # Pip
 from selenium_firefox import Firefox
 import tldextract
-import stopit
+from kstopit import signal_timeoutable
 
 # ---------------------------------------------------------------------------------------------------------------------------------------- #
 
@@ -38,7 +38,7 @@ class SeleniumAccount:
         default_find_func_timeout: int = 2.5,
         prompt_user_input_login: bool = True,
         login_prompt_callback: Optional[Callable[[str], None]] = None,
-        login_prompt_timeout_seconds: Optional[float] = None
+        login_prompt_timeout_seconds: int = 60*5
     ):
         self.browser = Firefox(
             cookies_folder_path=cookies_folder_path,
@@ -176,25 +176,7 @@ class SeleniumAccount:
 
     # ------------------------------------------------------- Private methods -------------------------------------------------------- #
 
-    def _run_with_timout(
-        self,
-        func,
-        custom_error_message: Optional[str] = None,
-        timeout_value: Optional[float] = None,
-        *args,
-        **kwargs
-    ):
-        error_message = self.__time_out_error(custom_error_message, self.page_name, self.__internal_id)
-
-        @stopit.signal_timeoutable(default=error_message, timeout_param='_timeout_param')
-        def f(*args, **kwargs):
-            return func(*args, **kwargs)
-
-        try:
-            return f(_timeout_param=timeout_value, *args, **kwargs)
-        except Exception as e:
-            return e
-
+    @signal_timeoutable(function_name='login_prompt_callback')
     def __call_login_prompt_callback(
         self,
         login_prompt_callback: Callable[[str], None],
