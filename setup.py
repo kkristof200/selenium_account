@@ -9,14 +9,14 @@ else:
 
 setuptools.setup(
     name="selenium_account",
-    version="0.0.2",
+    version="0.0.3",
     author="Kristof",
     description="selenium_account",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/kkristof200/selenium_account",
     packages=setuptools.find_packages(),
-    install_requires=["selenium_firefox"],
+    install_requires=["tldextract", "stopit", "selenium_firefox"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
