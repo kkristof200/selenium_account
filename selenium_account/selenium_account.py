@@ -162,7 +162,7 @@ class SeleniumAccount:
         return True
     
     def print(self, *args, **kwargs) -> None:
-        print('{} - {} -'.format(self.page_name, self.__internal_id), *args **kwargs)
+        print('{} - {} -'.format(self.page_name, self.__internal_id), *args, **kwargs)
 
     def save_cookies(self) -> None:
         self.browser.save_cookies()
