@@ -3,7 +3,7 @@
 # System
 import time, os
 from abc import abstractmethod
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Callable
 
 # Pip
 from selenium_firefox import Firefox
@@ -37,7 +37,7 @@ class SeleniumAccount:
         disable_images: bool = False,
         default_find_func_timeout: int = 2.5,
         prompt_user_input_login: bool = True,
-        login_prompt_callback: Optional[Callable[None, None]] = None,
+        login_prompt_callback: Optional[Callable[[str], None]] = None,
         login_prompt_timeout_seconds: Optional[float] = None
     ):
         self.browser = Firefox(
@@ -130,7 +130,7 @@ class SeleniumAccount:
     def login_via_cookies(
         self,
         prompt_user_input_login: bool = True,
-        login_prompt_callback: Optional[Callable[None, None]] = None,
+        login_prompt_callback: Optional[Callable[[str], None]] = None,
         login_prompt_timeout_seconds: Optional[float] = None,
         save_cookies: bool = True
     ) -> bool:
@@ -144,11 +144,14 @@ class SeleniumAccount:
 
         if not login_actual_result:
             if prompt_user_input_login or login_prompt_callback is not None:
-                def local_login_prompt_callback():
-                    input('{} - {} - Log in and press Enter/Return: '.format(self.page_name, self.__internal_id))
+                def local_login_prompt_callback(message: str):
+                    input(message)
 
                 try:
-                    self.__call_login_prompt_callback(login_prompt_callback if login_prompt_callback is not None else local_login_prompt_callback, timeout=login_prompt_timeout_seconds)
+                    self.__call_login_prompt_callback(
+                        login_prompt_callback if login_prompt_callback is not None else local_login_prompt_callback,
+                        timeout=login_prompt_timeout_seconds
+                    )
 
                     return self.login_via_cookies(promt_user_input_login=False, save_cookies=save_cookies)
                 except Exception as e:
@@ -181,10 +184,49 @@ class SeleniumAccount:
     @stopit.signal_timeoutable(default=self.time_out_error('Logging in'), timeout_param='timeout')
     def __call_login_prompt_callback(
         self,
-        login_prompt_callback: Callable[None, None],
+        login_prompt_callback: Callable[[srt], None],
         timeout: float = None
     ) -> None:
-        login_prompt_callback()
+        message = '{} - {} - Needs login.'.format(self.page_name, self.__internal_id)
+
+        if timeout:
+            message += ' (Timeout: {}s)'.format(self.__seconds_to_time_str(timeout))
+
+        login_prompt_callback(message)
+
+    @staticmethod
+    def __seconds_to_time_str(seconds: float) -> str:
+        hours = int(seconds/3600)
+        seconds -= hours*3600
+
+        minutes = int(seconds/60)
+        seconds -= minutes*60
+
+        millis = seconds - int(seconds)
+        seconds = int(seconds)
+        time_str = ''
+
+        if hours > 0:
+            time_str = str(hours).zfill(2)
+
+        if minutes > 0 or len(time_str) > 0:
+            if len(time_str) > 0:
+                time_str += ':'
+
+            time_str += str(minutes).zfill(2)
+
+        if seconds > 0 or len(time_str) > 0:
+            if len(time_str) > 0:
+                time_str += ':'
+
+            time_str += str(seconds).zfill(2)
+
+        if millis > 0:
+            time_str += '.'
+
+            time_str += str(int(millis*1000)).rstrip('0')
+
+        return time_str
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------------- #
