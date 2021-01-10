@@ -181,7 +181,7 @@ class SeleniumAccount:
 
     # ------------------------------------------------------- Private methods -------------------------------------------------------- #
 
-    @stopit.signal_timeoutable(default=self.time_out_error('Logging in'), timeout_param='timeout')
+    @stopit.signal_timeoutable(default=self.time_out_error('Login'), timeout_param='timeout')
     def __call_login_prompt_callback(
         self,
         login_prompt_callback: Callable[[srt], None],
