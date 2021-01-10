@@ -194,7 +194,7 @@ class SeleniumAccount:
 
     def __call_login_prompt_callback(
         self,
-        login_prompt_callback: Callable[[srt], None],
+        login_prompt_callback: Callable[[str], None],
         timeout: float = None
     ) -> None:
         message = '{} - {} - Needs login.'.format(self.page_name, self.__internal_id)
