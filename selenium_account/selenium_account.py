@@ -10,9 +10,6 @@ from selenium_firefox import Firefox
 import tldextract
 import stopit
 
-# Local
-from .time_out_error import time_out_error
-
 # ---------------------------------------------------------------------------------------------------------------------------------------- #
 
 
@@ -176,7 +173,25 @@ class SeleniumAccount:
 
     # ------------------------------------------------------- Private methods -------------------------------------------------------- #
 
-    @stopit.signal_timeoutable(default=time_out_error('Login'), timeout_param='timeout')
+    def _run_with_timout(
+        self,
+        func,
+        custom_error_message: Optional[str] = None,
+        timeout_value: Optional[float] = None,
+        *args,
+        **kwargs
+    ):
+        error_message = self.__time_out_error(custom_error_message, self.page_name, self.__internal_id)
+
+        @stopit.signal_timeoutable(default=error_message, _timeout_param='_timeout_param')
+        def f(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        try:
+            return f(_timeout_param=timeout_value, *args, **kwargs)
+        except Exception as e:
+            return e
+
     def __call_login_prompt_callback(
         self,
         login_prompt_callback: Callable[[srt], None],
@@ -188,6 +203,15 @@ class SeleniumAccount:
             message += ' (Timeout: {}s)'.format(self.__seconds_to_time_str(timeout))
 
         login_prompt_callback(message)
+
+    @staticmethod
+    def __time_out_error(page_name: str, internal_id: str, custom_message: Optional[str] = None) -> TimeoutError:
+        message = 'TimeoutError - {} - {} - Operation did time out.'.format(page_name, internal_id)
+
+        if custom_message:
+            message += ' - {}'.format(custom_message)
+
+        return TimeoutError(message)
 
     @staticmethod
     def __seconds_to_time_str(seconds: float) -> str:
