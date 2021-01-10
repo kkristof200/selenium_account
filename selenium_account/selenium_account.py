@@ -74,7 +74,7 @@ class SeleniumAccount:
         except Exception as e:
             print(e)
             self.did_log_in_at_init = False
-            self.quit()
+            # self.quit()
 
 
     # ----------------------------------------------------- Abstract properties ------------------------------------------------------ #
