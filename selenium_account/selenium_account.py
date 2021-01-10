@@ -183,7 +183,7 @@ class SeleniumAccount:
     ):
         error_message = self.__time_out_error(custom_error_message, self.page_name, self.__internal_id)
 
-        @stopit.signal_timeoutable(default=error_message, _timeout_param='_timeout_param')
+        @stopit.signal_timeoutable(default=error_message, timeout_param='_timeout_param')
         def f(*args, **kwargs):
             return func(*args, **kwargs)
 
