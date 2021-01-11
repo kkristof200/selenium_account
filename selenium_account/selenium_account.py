@@ -74,10 +74,11 @@ class SeleniumAccount:
         except Exception as e:
             self.print(e)
             self.did_log_in_at_init = False
-            # self.quit()
+
+        self.current_user_id = self.__get_current_user_id() if self.did_log_in_at_init else None
 
 
-    # ----------------------------------------------------- Abstract properties ------------------------------------------------------ #
+    # ------------------------------------------------------- Abstract methods ------------------------------------------------------- #
 
     @abstractmethod
     def _home_url(self) -> str:
@@ -87,8 +88,20 @@ class SeleniumAccount:
     def _is_logged_in(self) -> bool:
         pass
 
+    @abstractmethod
+    def _get_current_user_id(self) -> Optional[str]:
+        pass
+
+    @abstractmethod
+    def _profile_url_format(self) -> Optional[str]:
+        pass
+
 
     # ------------------------------------------------------ Public properties ------------------------------------------------------- #
+
+    @property
+    def current_profile_url(self) -> Optional[str]:
+        return self.profile_url()
 
     @property
     def home_url(self) -> str:
@@ -118,6 +131,25 @@ class SeleniumAccount:
 
 
     # -------------------------------------------------------- Public methods -------------------------------------------------------- #
+
+    def profile_url(
+        self,
+        profile_id: Optional[Union[str, int]]
+    ) -> Optional[str]:
+        return self._profile_url_format.format(profile_id) if profile_id else None
+
+    def get_profile(
+        self,
+        profile_id: Optional[Union[str, int]]
+    ) -> bool:
+        if not profile_id:
+            self.print('Could not get profile, because \'profile_id\' is None')
+
+            return False
+
+        self.get(profile_url(profile_id))
+
+        return True
 
     def login_via_cookies(
         self,
@@ -176,7 +208,7 @@ class SeleniumAccount:
 
     # ------------------------------------------------------- Private methods -------------------------------------------------------- #
 
-    @signal_timeoutable(function_name='login_prompt_callback')
+    @signal_timeoutable(name='login_prompt_callback')
     def __call_login_prompt_callback(
         self,
         login_prompt_callback: Callable[[str], None],
