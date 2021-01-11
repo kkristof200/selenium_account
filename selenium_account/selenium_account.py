@@ -57,6 +57,8 @@ class SeleniumAccount:
             default_find_func_timeout=default_find_func_timeout
         )
 
+        self.current_user_id = None
+
         try:
             self.__internal_id = cookies_folder_path.strip(os.path.sep).split(os.path.sep)[-1]
         except:
@@ -75,7 +77,8 @@ class SeleniumAccount:
             self.print(e)
             self.did_log_in_at_init = False
 
-        self.current_user_id = self._get_current_user_id() if self.did_log_in_at_init else None
+        if self.did_log_in_at_init:
+            self.current_user_id = self._get_current_user_id()
 
 
     # ------------------------------------------------------- Abstract methods ------------------------------------------------------- #
@@ -109,7 +112,7 @@ class SeleniumAccount:
 
     @property
     def is_logged_in(self) -> bool:
-        return self._is_logged_in()
+        return self.current_user_id is not None or self._is_logged_in()
 
     @property
     def domain(self) -> str:
