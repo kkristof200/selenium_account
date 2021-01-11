@@ -88,10 +88,6 @@ class SeleniumAccount:
         pass
 
     @abstractmethod
-    def _is_logged_in(self) -> bool:
-        pass
-
-    @abstractmethod
     def _get_current_user_id(self) -> Optional[str]:
         pass
 
@@ -112,6 +108,8 @@ class SeleniumAccount:
 
     @property
     def is_logged_in(self) -> bool:
+        self.current_user_id = self.current_user_id or self._get_current_user_id()
+
         return self.current_user_id is not None or self._is_logged_in()
 
     @property
@@ -209,6 +207,9 @@ class SeleniumAccount:
 
 
     # ------------------------------------------------------- Private methods -------------------------------------------------------- #
+
+    def _is_logged_in(self) -> bool:
+        return False
 
     @signal_timeoutable(name='login_prompt_callback')
     def __call_login_prompt_callback(
