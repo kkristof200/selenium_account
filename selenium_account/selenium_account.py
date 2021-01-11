@@ -3,7 +3,7 @@
 # System
 import time, os
 from abc import abstractmethod
-from typing import Optional, List, Tuple, Callable
+from typing import Optional, List, Tuple, Callable, Union
 
 # Pip
 from selenium_firefox import Firefox
