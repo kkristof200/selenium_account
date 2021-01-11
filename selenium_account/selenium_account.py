@@ -62,7 +62,7 @@ class SeleniumAccount:
         except:
             self.__internal_id = cookies_folder_path or self.browser.cookies_folder_path
 
-        self.browser.get(self.home_url)
+        self.get(self.home_url)
 
         try:
             self.did_log_in_at_init = self.login_via_cookies(
@@ -75,7 +75,7 @@ class SeleniumAccount:
             self.print(e)
             self.did_log_in_at_init = False
 
-        self.current_user_id = self.__get_current_user_id() if self.did_log_in_at_init else None
+        self.current_user_id = self._get_current_user_id() if self.did_log_in_at_init else None
 
 
     # ------------------------------------------------------- Abstract methods ------------------------------------------------------- #
@@ -101,7 +101,7 @@ class SeleniumAccount:
 
     @property
     def current_profile_url(self) -> Optional[str]:
-        return self.profile_url()
+        return self.profile_url(self.current_user_id)
 
     @property
     def home_url(self) -> str:
@@ -113,19 +113,15 @@ class SeleniumAccount:
 
     @property
     def domain(self) -> str:
-        if hasattr(self, '__domain'):
-            return self.__domain
-
-        self.__domain = tldextract.extract(self.home_url).domain
+        if not hasattr(self, '__domain'):
+            self.__domain = tldextract.extract(self.home_url).domain
 
         return self.__domain
 
     @property
     def page_name(self) -> str:
-        if hasattr(self, '__page_name'):
-            return self.__page_name
-
-        self.__page_name = self.domain.lower().title()
+        if not hasattr(self, '__page_name'):
+            self.__page_name = self.domain.lower().title()
 
         return self.__page_name
 
@@ -134,9 +130,9 @@ class SeleniumAccount:
 
     def profile_url(
         self,
-        profile_id: Optional[Union[str, int]]
+        profile_id: Union[str, int]
     ) -> Optional[str]:
-        return self._profile_url_format.format(profile_id) if profile_id else None
+        return self._profile_url_format().format(profile_id) if profile_id else None
 
     def get_profile(
         self,
@@ -147,7 +143,7 @@ class SeleniumAccount:
 
             return False
 
-        self.get(profile_url(profile_id))
+        self.get(self.profile_url(profile_id))
 
         return True
 
@@ -177,7 +173,7 @@ class SeleniumAccount:
                         timeout=login_prompt_timeout_seconds
                     )
 
-                    return self.login_via_cookies(promt_user_input_login=False, save_cookies=save_cookies)
+                    return self.login_via_cookies(prompt_user_input_login=False, save_cookies=save_cookies)
                 except Exception as e:
                     self.print(e)
 
@@ -187,7 +183,7 @@ class SeleniumAccount:
 
         self.print('Successfully logged in. Saving cookies.')
         time.sleep(0.5)
-        self.browser.get(self.home_url)
+        self.get(self.home_url)
         time.sleep(0.5)
         self.save_cookies()
 
@@ -198,6 +194,9 @@ class SeleniumAccount:
 
     def save_cookies(self) -> None:
         self.browser.save_cookies()
+
+    def get(self, url: str) -> bool:
+        return self.browser.get(url)
 
     def quit(self) -> None:
         try:
