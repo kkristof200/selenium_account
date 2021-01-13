@@ -196,14 +196,22 @@ class SeleniumAccount:
     def save_cookies(self) -> None:
         self.browser.save_cookies()
 
-    def get(self, url: str) -> bool:
-        return self.browser.get(url)
+    def get(
+        self,
+        url: str,
+        force: bool = False
+    ) -> bool:
+        return self.browser.get(url, force=force)
 
-    def quit(self) -> None:
+    def quit(self) -> bool:
         try:
-            self.browser.driver.quit()
-        except:
-            pass
+            self.browser.quit()
+
+            return True
+        except Exception as e:
+            print('Error - SeleniumAcc: quit() - ', e)
+
+            return False
 
 
     # --------------------------------------------------------- Destructor ----------------------------------------------------------- #
@@ -211,8 +219,8 @@ class SeleniumAccount:
     def __del__(self):
         try:
             self.quit()
-        except:
-            pass
+        except Exception as e:
+            print('Error - SeleniumAcc: __del__() - ', e)
 
 
     # ------------------------------------------------------- Private methods -------------------------------------------------------- #
