@@ -125,6 +125,10 @@ class SeleniumAccount:
             self.__page_name = self.domain.lower().title()
 
         return self.__page_name
+    
+    @property
+    def user_agent(self) -> Optional[str]:
+        return self.browser.user_agent
 
 
     # -------------------------------------------------------- Public methods -------------------------------------------------------- #
