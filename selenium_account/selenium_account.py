@@ -140,7 +140,7 @@ class SeleniumAccount:
     @property
     def proxy_port(self) -> Optional[int]:
         return self.browser.proxy_port
-    
+
     @property
     def proxy_str(self) -> Optional[str]:
         return self.browser.proxy_str
