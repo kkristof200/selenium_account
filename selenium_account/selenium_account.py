@@ -135,15 +135,15 @@ class SeleniumAccount:
 
     @property
     def proxy_host(self) -> Optional[str]:
-        return self.browser.user_agent
+        return self.browser.proxy_host
 
     @property
     def proxy_port(self) -> Optional[int]:
-        return self.browser.user_agent
+        return self.browser.proxy_port
     
     @property
     def proxy_str(self) -> Optional[str]:
-        return self.browser.user_agent
+        return self.browser.proxy_str
 
 
     # -------------------------------------------------------- Public methods -------------------------------------------------------- #
