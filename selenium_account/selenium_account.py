@@ -84,6 +84,10 @@ class SeleniumAccount:
     # ------------------------------------------------------- Abstract methods ------------------------------------------------------- #
 
     @abstractmethod
+    def upload_function(self) -> Callable:
+        pass
+
+    @abstractmethod
     def _home_url(self) -> str:
         pass
 
