@@ -1,9 +1,9 @@
 # --------------------------------------------------------------- Imports ---------------------------------------------------------------- #
 
 # System
-import time, os
-from abc import abstractmethod
 from typing import Optional, List, Tuple, Callable, Union
+from abc import abstractmethod
+import time, os
 
 # Pip
 from selenium_firefox import Firefox
@@ -82,10 +82,6 @@ class SeleniumAccount:
 
 
     # ------------------------------------------------------- Abstract methods ------------------------------------------------------- #
-
-    @abstractmethod
-    def upload_function(self) -> Callable:
-        pass
 
     @abstractmethod
     def _home_url(self) -> str:
