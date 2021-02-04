@@ -6,7 +6,7 @@ from abc import abstractmethod
 import time, os
 
 # Pip
-from selenium_firefox import Firefox
+from selenium_firefox import Firefox, Proxy, BaseAddonInstallSettings
 import tldextract
 from kstopit import signal_timeoutable
 
@@ -22,39 +22,76 @@ class SeleniumAccount:
 
     def __init__(
         self,
+
+        # cookies
         cookies_folder_path: Optional[str] = None,
-        extensions_folder_path: Optional[str] = None,
+        cookies_id: Optional[str] = None,
+        pickle_cookies: bool = False,
+
+        # proxy
+        proxy: Optional[Union[Proxy, str]] = None,
+        # proxy - legacy (kept for convenience)
         host: Optional[str] = None,
         port: Optional[int] = None,
-        cookies_id: Optional[str] = None,
+
+        # addons
+        addons_folder_path: Optional[str] = None,
+        addon_settings: Optional[List[BaseAddonInstallSettings]] = None,
+        # addons - legacy (kept for convenience)
+        extensions_folder_path: Optional[str] = None,
+
+        # other paths
+        geckodriver_path: Optional[str] = None,
         firefox_binary_path: Optional[str] = None,
+        profile_path: Optional[str] = None,
+
+        # profile settings
         private: bool = False,
-        screen_size: Optional[Tuple[int, int]] = None,
+        screen_size: Optional[Tuple[int, int]] = None, # (width, height)
         full_screen: bool = True,
         headless: bool = False,
         language: str = 'en-us',
         user_agent: Optional[str] = None,
         disable_images: bool = False,
+
+        # find function
         default_find_func_timeout: int = 2.5,
+
+        # login
         prompt_user_input_login: bool = True,
         login_prompt_callback: Optional[Callable[[str], None]] = None,
         login_prompt_timeout_seconds: int = 60*5
     ):
         self.browser = Firefox(
             cookies_folder_path=cookies_folder_path,
-            extensions_folder_path=extensions_folder_path,
+            cookies_id=cookies_id,
+            pickle_cookies=pickle_cookies,
+
+            # proxy
+            proxy=proxy,
+            # proxy - legacy (kept for convenience)
             host=host,
             port=port,
-            cookies_id=cookies_id,
+
+            # addons
+            addons_folder_path=addons_folder_path,
+            addon_settings=addon_settings,
+            # addons - legacy (kept for convenience)
+            extensions_folder_path=extensions_folder_path,
+
+            # other paths
+            geckodriver_path=geckodriver_path,
             firefox_binary_path=firefox_binary_path,
+            profile_path=profile_path,
+
+            # profile settings
             private=private,
             screen_size=screen_size,
             full_screen=full_screen,
             headless=headless,
             language=language,
             user_agent=user_agent,
-            disable_images=disable_images,
-            default_find_func_timeout=default_find_func_timeout
+            disable_images=disable_images
         )
 
         self.current_user_id = None
@@ -95,6 +132,10 @@ class SeleniumAccount:
     def _profile_url_format(self) -> Optional[str]:
         pass
 
+    @abstractmethod
+    def _login_via_cookies_needed_cookie_names(self) -> Union[str, List[str]]:
+        pass
+
 
     # ------------------------------------------------------ Public properties ------------------------------------------------------- #
 
@@ -108,9 +149,7 @@ class SeleniumAccount:
 
     @property
     def is_logged_in(self) -> bool:
-        self.current_user_id = self.current_user_id or self._get_current_user_id()
-
-        return self.current_user_id is not None or self._is_logged_in()
+        return self.browser.has_all_cookies(self._login_via_cookies_needed_cookie_names())
 
     @property
     def domain(self) -> str:
@@ -125,25 +164,14 @@ class SeleniumAccount:
             self.__page_name = self.domain.lower().title()
 
         return self.__page_name
-    
+
     @property
-    def user_agent(self) -> Optional[str]:
+    def user_agent(self) -> str:
         return self.browser.user_agent
 
-
-    # proxy
-
     @property
-    def proxy_host(self) -> Optional[str]:
-        return self.browser.proxy_host
-
-    @property
-    def proxy_port(self) -> Optional[int]:
-        return self.browser.proxy_port
-
-    @property
-    def proxy_str(self) -> Optional[str]:
-        return self.browser.proxy_str
+    def proxy(self) -> Optional[Proxy]:
+        return self.browser.proxy
 
 
     # -------------------------------------------------------- Public methods -------------------------------------------------------- #
@@ -174,7 +202,7 @@ class SeleniumAccount:
         login_prompt_timeout_seconds: Optional[float] = None,
         save_cookies: bool = True
     ) -> bool:
-        login_cookies_result = self.browser.login_via_cookies(self.home_url, None)
+        login_cookies_result = self.browser.login_via_cookies(self.home_url, self._login_via_cookies_needed_cookie_names())
         login_actual_result = login_cookies_result and self.is_logged_in
 
         if not login_cookies_result:
@@ -243,9 +271,6 @@ class SeleniumAccount:
 
 
     # ------------------------------------------------------- Private methods -------------------------------------------------------- #
-
-    def _is_logged_in(self) -> bool:
-        return False
 
     @signal_timeoutable(name='login_prompt_callback')
     def __call_login_prompt_callback(
