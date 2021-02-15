@@ -217,7 +217,7 @@ class SeleniumAccount:
 
                 try:
                     self.__call_login_prompt_callback(
-                        login_prompt_callback if login_prompt_callback is not None else local_login_prompt_callback,
+                        login_prompt_callback if login_prompt_callback else local_login_prompt_callback,
                         timeout=login_prompt_timeout_seconds
                     )
 
@@ -281,18 +281,9 @@ class SeleniumAccount:
         message = '{} - {} - Needs login.'.format(self.page_name, self.__internal_id)
 
         if timeout:
-            message += ' (Timeout: {}s)'.format(self.__seconds_to_time_str(timeout))
+            message += ' (Timeout: {})'.format(self.__seconds_to_time_str(timeout))
 
         login_prompt_callback(message)
-
-    @staticmethod
-    def __time_out_error(custom_message: Optional[str] = None) -> TimeoutError:
-        message = 'TimeoutError - Operation did time out'
-
-        if custom_message:
-            message += ': \'{}\''.format(custom_message)
-
-        return TimeoutError(message)
 
     @staticmethod
     def __seconds_to_time_str(seconds: float) -> str:
