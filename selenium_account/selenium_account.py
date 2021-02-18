@@ -54,6 +54,9 @@ class SeleniumAccount:
         user_agent: Optional[str] = None,
         disable_images: bool = False,
 
+        # selenium-wire support
+        webdriver_class: Optional = None,
+
         # find function
         default_find_func_timeout: int = 2.5,
 
@@ -91,7 +94,13 @@ class SeleniumAccount:
             headless=headless,
             language=language,
             user_agent=user_agent,
-            disable_images=disable_images
+            disable_images=disable_images,
+
+            # selenium-wire support
+            webdriver_class=webdriver_class,
+
+            # find function
+            default_find_func_timeout=default_find_func_timeout
         )
 
         self.current_user_id = None
