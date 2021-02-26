@@ -61,7 +61,13 @@ class SeleniumAccount:
         webdriver_class: Optional = None,
 
         # find function
-        default_find_func_timeout: int = 2.5
+        default_find_func_timeout: int = 2.5,
+
+
+        # login
+        prompt_user_input_login: bool = True,
+        login_prompt_callback: Optional[Callable[[str], None]] = None,
+        login_prompt_timeout_seconds: int = 60*5
     ):
         self.browser = Firefox(
             cookies_folder_path=cookies_folder_path,

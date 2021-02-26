@@ -9,7 +9,7 @@ else:
 
 setuptools.setup(
     name="selenium_account",
-    version="0.1.5",
+    version="0.1.6",
     author="Kristof",
     description="selenium_account",
     long_description=long_description,
