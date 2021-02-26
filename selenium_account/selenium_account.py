@@ -55,6 +55,7 @@ class SeleniumAccount:
         # option settings
         screen_size: Optional[Tuple[int, int]] = None, # (width, height)
         headless: bool = False,
+        mute_audio: bool = False,
         home_page_url: Optional[str] = None,
 
         # selenium-wire support
@@ -101,6 +102,7 @@ class SeleniumAccount:
             # option settings
             screen_size=screen_size,
             headless=headless,
+            mute_audio=mute_audio,
             home_page_url=home_page_url,
 
             # selenium-wire support
