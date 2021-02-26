@@ -47,23 +47,21 @@ class SeleniumAccount:
 
         # profile settings
         private: bool = False,
-        screen_size: Optional[Tuple[int, int]] = None, # (width, height)
         full_screen: bool = True,
-        headless: bool = False,
         language: str = 'en-us',
         user_agent: Optional[str] = None,
         disable_images: bool = False,
+
+        # option settings
+        screen_size: Optional[Tuple[int, int]] = None, # (width, height)
+        headless: bool = False,
+        home_page_url: Optional[str] = None,
 
         # selenium-wire support
         webdriver_class: Optional = None,
 
         # find function
-        default_find_func_timeout: int = 2.5,
-
-        # login
-        prompt_user_input_login: bool = True,
-        login_prompt_callback: Optional[Callable[[str], None]] = None,
-        login_prompt_timeout_seconds: int = 60*5
+        default_find_func_timeout: int = 2.5
     ):
         self.browser = Firefox(
             cookies_folder_path=cookies_folder_path,
@@ -89,12 +87,15 @@ class SeleniumAccount:
 
             # profile settings
             private=private,
-            screen_size=screen_size,
             full_screen=full_screen,
-            headless=headless,
             language=language,
             user_agent=user_agent,
             disable_images=disable_images,
+
+            # option settings
+            screen_size=screen_size,
+            headless=headless,
+            home_page_url=home_page_url,
 
             # selenium-wire support
             webdriver_class=webdriver_class,
