@@ -261,6 +261,12 @@ class SeleniumAccount:
     def save_cookies(self) -> None:
         self.browser.save_cookies()
 
+    def backup_profile(
+        self,
+        target_profile_path: Optional[str] = None
+    ) -> bool:
+        return self.browser.backup_profile(target_profile_path=target_profile_path)
+
     def get(
         self,
         url: str,
