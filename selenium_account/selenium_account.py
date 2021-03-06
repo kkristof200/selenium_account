@@ -263,9 +263,15 @@ class SeleniumAccount:
 
     def backup_profile(
         self,
-        target_profile_path: Optional[str] = None
+        target_profile_path: Optional[str] = None,
+        delete_cache: bool = True,
+        delete_storage: bool = True,
     ) -> bool:
-        return self.browser.backup_profile(target_profile_path=target_profile_path)
+        return self.browser.backup_profile(
+            target_profile_path=target_profile_path,
+            delete_cache=delete_cache,
+            delete_storage=delete_storage
+        )
 
     def get(
         self,
