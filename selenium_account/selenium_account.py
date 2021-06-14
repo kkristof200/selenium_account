@@ -1,4 +1,4 @@
-# --------------------------------------------------------------- Imports ---------------------------------------------------------------- #
+# ------------------------------------------------------------ Imports ----------------------------------------------------------- #
 
 # System
 from typing import Optional, List, Tuple, Callable, Union
@@ -6,118 +6,39 @@ from abc import abstractmethod
 import time, os
 
 # Pip
-from selenium_firefox import Firefox, Proxy, BaseAddonInstallSettings
+from kproxy import Proxy
+from selenium_browser import Browser
 import tldextract
 from kstopit import signal_timeoutable
 
-# ---------------------------------------------------------------------------------------------------------------------------------------- #
+# -------------------------------------------------------------------------------------------------------------------------------- #
 
 
 
-# -------------------------------------------------------- class: SeleniumAccount -------------------------------------------------------- #
+# ---------------------------------------------------- class: SeleniumAccount ---------------------------------------------------- #
 
 class SeleniumAccount:
 
-    # ------------------------------------------------------------- Init ------------------------------------------------------------- #
+    # --------------------------------------------------------- Init --------------------------------------------------------- #
 
     def __init__(
         self,
 
-        # cookies
-        cookies_folder_path: Optional[str] = None,
-        cookies_id: Optional[str] = None,
-        pickle_cookies: bool = False,
-
-        # proxy
-        proxy: Optional[Union[Proxy, str]] = None,
-        # proxy - legacy (kept for convenience)
-        host: Optional[str] = None,
-        port: Optional[int] = None,
-
-        # addons
-        addons_folder_path: Optional[str] = None,
-        addon_settings: Optional[List[BaseAddonInstallSettings]] = None,
-        # addons - legacy (kept for convenience)
-        extensions_folder_path: Optional[str] = None,
-
-        # other paths
-        geckodriver_path: Optional[str] = None,
-        firefox_binary_path: Optional[str] = None,
-        profile_path: Optional[str] = None,
-
-        # profile settings
-        private: bool = False,
-        full_screen: bool = True,
-        language: str = 'en-us',
-        user_agent: Optional[str] = None,
-        disable_images: bool = False,
-
-        # option settings
-        screen_size: Optional[Tuple[int, int]] = None, # (width, height)
-        headless: bool = False,
-        mute_audio: bool = False,
-        home_page_url: Optional[str] = None,
-
-        # selenium-wire support
-        webdriver_class: Optional = None,
-
-        # find function
-        default_find_func_timeout: int = 2.5,
-
+        # browser
+        browser: Browser,
 
         # login
         prompt_user_input_login: bool = True,
         login_prompt_callback: Optional[Callable[[str], None]] = None,
         login_prompt_timeout_seconds: int = 60*5
     ):
-        self.browser = Firefox(
-            cookies_folder_path=cookies_folder_path,
-            cookies_id=cookies_id,
-            pickle_cookies=pickle_cookies,
-
-            # proxy
-            proxy=proxy,
-            # proxy - legacy (kept for convenience)
-            host=host,
-            port=port,
-
-            # addons
-            addons_folder_path=addons_folder_path,
-            addon_settings=addon_settings,
-            # addons - legacy (kept for convenience)
-            extensions_folder_path=extensions_folder_path,
-
-            # other paths
-            geckodriver_path=geckodriver_path,
-            firefox_binary_path=firefox_binary_path,
-            profile_path=profile_path,
-
-            # profile settings
-            private=private,
-            full_screen=full_screen,
-            language=language,
-            user_agent=user_agent,
-            disable_images=disable_images,
-
-            # option settings
-            screen_size=screen_size,
-            headless=headless,
-            mute_audio=mute_audio,
-            home_page_url=home_page_url,
-
-            # selenium-wire support
-            webdriver_class=webdriver_class,
-
-            # find function
-            default_find_func_timeout=default_find_func_timeout
-        )
-
+        self.browser = browser
         self.current_user_id = None
 
         try:
-            self.__internal_id = cookies_folder_path.strip(os.path.sep).split(os.path.sep)[-1]
+            self.__internal_id = browser.cookies_folder_path.strip(os.path.sep).split(os.path.sep)[-1]
         except:
-            self.__internal_id = cookies_folder_path or self.browser.cookies_folder_path
+            self.__internal_id = browser.cookies_folder_path or self.browser.cookies_folder_path
 
         self.get(self.home_url)
 
@@ -136,7 +57,7 @@ class SeleniumAccount:
             self.current_user_id = self._get_current_user_id()
 
 
-    # ------------------------------------------------------- Abstract methods ------------------------------------------------------- #
+    # --------------------------------------------------- Abstract methods --------------------------------------------------- #
 
     @abstractmethod
     def _home_url(self) -> str:
@@ -155,7 +76,7 @@ class SeleniumAccount:
         pass
 
 
-    # ------------------------------------------------------ Public properties ------------------------------------------------------- #
+    # --------------------------------------------------- Public properties -------------------------------------------------- #
 
     @property
     def current_profile_url(self) -> Optional[str]:
@@ -192,7 +113,7 @@ class SeleniumAccount:
         return self.browser.proxy
 
 
-    # -------------------------------------------------------- Public methods -------------------------------------------------------- #
+    # ---------------------------------------------------- Public methods ---------------------------------------------------- #
 
     def profile_url(
         self,
@@ -291,7 +212,7 @@ class SeleniumAccount:
             return False
 
 
-    # --------------------------------------------------------- Destructor ----------------------------------------------------------- #
+    # ------------------------------------------------------ Destructor ------------------------------------------------------ #
 
     def __del__(self):
         try:
@@ -300,7 +221,7 @@ class SeleniumAccount:
             print('Error - SeleniumAcc: __del__() - ', e)
 
 
-    # ------------------------------------------------------- Private methods -------------------------------------------------------- #
+    # ---------------------------------------------------- Private methods --------------------------------------------------- #
 
     @signal_timeoutable(name='login_prompt_callback')
     def __call_login_prompt_callback(
@@ -350,4 +271,4 @@ class SeleniumAccount:
         return time_str
 
 
-# ---------------------------------------------------------------------------------------------------------------------------------------- #
+# -------------------------------------------------------------------------------------------------------------------------------- #
