@@ -9,7 +9,7 @@ else:
 
 setuptools.setup(
     name="selenium_account",
-    version="0.2.2",
+    version="0.2.3",
     author="Kristof",
     description="selenium_account",
     long_description=long_description,
@@ -18,7 +18,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'kproxy>=0.0.1',
-        'kstopit>=0.0.13',
+        'kstopit>=0.0.16',
         'selenium-browser>=0.0.12',
         'setuptools>=67.8.0',
         'tldextract>=3.1.2'
